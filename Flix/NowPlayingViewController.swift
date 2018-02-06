@@ -12,6 +12,8 @@ import AlamofireImage
 
 class NowPlayingViewController: UIViewController, UITableViewDataSource {
 
+    @IBOutlet weak var activityIndicator: UIActivityIndicatorView!
+  
     @IBOutlet weak var tableView: UITableView!
     
     var movies: [[String: Any]] = []
@@ -27,7 +29,11 @@ class NowPlayingViewController: UIViewController, UITableViewDataSource {
     
         tableView.dataSource = self
         tableView.rowHeight = 150
+        activityIndicator.startAnimating()    // Start the activity indicator
+
         fetchMovies()
+    
+      //  let alertController = UIAlertController(title: "Title", message: "Message", preferredStyle: .alert) //Create the alert controller for internet errot
         
     }
     
@@ -45,11 +51,28 @@ class NowPlayingViewController: UIViewController, UITableViewDataSource {
             //This will run when the network request returns
             if let error = error{
                 print(error.localizedDescription)
+                
+                let alertController = UIAlertController(title: "Error", message: "No Internet Connection", preferredStyle: .alert) //Create the alert controller for internet errot
+               // alertController.
+                
+                let OKAction = UIAlertAction(title: "Try Again", style: .default) { (action) in
+                    // handle response here.
+                    self.fetchMovies()
+                }
+                // add the OK action to the alert controller
+                alertController.addAction(OKAction)
+                self.present(alertController, animated: true)
+                
+                
+                
+                
             } else if let data = data {
                 let dataDictionary = try! JSONSerialization.jsonObject(with: data, options: []) as! [String: Any]
                 // print(dataDictionary)
                 let movies = dataDictionary["results"] as![[String: Any]]
                 self.movies = movies
+                
+                self.activityIndicator.stopAnimating()   // Stop the activity indicator;Hides automatically if "Hides When Stopped" is enabled
                 self.tableView.reloadData()
                 self.refreshControl.endRefreshing()
             }
@@ -86,4 +109,9 @@ class NowPlayingViewController: UIViewController, UITableViewDataSource {
     
         return cell
     }
-        }
+}
+
+
+
+
+
