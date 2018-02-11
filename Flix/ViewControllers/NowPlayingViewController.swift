@@ -28,7 +28,7 @@ class NowPlayingViewController: UIViewController, UITableViewDataSource {
     tableView.insertSubview(refreshControl, at: 0)
     
         tableView.dataSource = self
-        tableView.rowHeight = 150
+        tableView.rowHeight = 170
         activityIndicator.startAnimating()    // Start the activity indicator
 
         fetchMovies()
@@ -109,8 +109,19 @@ class NowPlayingViewController: UIViewController, UITableViewDataSource {
     
         return cell
     }
+    
+    
+    override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
+        let cell = sender as! UITableViewCell
+        if let indexPath = tableView.indexPath(for: cell){
+            let movie = movies[indexPath.row]
+            let detailViewConroller = segue.destination as! DetailViewController
+            detailViewConroller.movie = movie
+        }
+        
+        
+    }
 }
-
 
 
 
