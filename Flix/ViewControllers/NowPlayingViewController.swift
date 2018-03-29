@@ -16,7 +16,7 @@ class NowPlayingViewController: UIViewController, UITableViewDataSource {
   
     @IBOutlet weak var tableView: UITableView!
     
-    var movies: [[String: Any]] = []
+    var movies: [Movie] = []
     var refreshControl: UIRefreshControl!
     
    @objc override func viewDidLoad() {
@@ -44,16 +44,10 @@ class NowPlayingViewController: UIViewController, UITableViewDataSource {
     }
     
     func fetchMovies() {
-        let url = URL(string: "https://api.themoviedb.org/3/movie/now_playing?api_key=fd8c81a8e62c3aa9e4e0939bbdb2fd68")!
-        let request = URLRequest(url: url, cachePolicy: .reloadIgnoringLocalCacheData, timeoutInterval: 10)
-        let session = URLSession(configuration: .default, delegate: nil, delegateQueue: OperationQueue.main)
-        let task = session.dataTask(with: request) { (data, response, error) in
-            //This will run when the network request returns
-            if let error = error{
-                print(error.localizedDescription)
-                
+        MovieApiManager().nowPlayingMovies { (movies: [Movie]?, error: Error?) in
+            if let error = error {
                 let alertController = UIAlertController(title: "Error", message: "No Internet Connection", preferredStyle: .alert) //Create the alert controller for internet errot
-               // alertController.
+                // alertController.
                 
                 let OKAction = UIAlertAction(title: "Try Again", style: .default) { (action) in
                     // handle response here.
@@ -62,24 +56,15 @@ class NowPlayingViewController: UIViewController, UITableViewDataSource {
                 // add the OK action to the alert controller
                 alertController.addAction(OKAction)
                 self.present(alertController, animated: true)
-                
-                
-                
-                
-            } else if let data = data {
-                let dataDictionary = try! JSONSerialization.jsonObject(with: data, options: []) as! [String: Any]
-                // print(dataDictionary)
-                let movies = dataDictionary["results"] as![[String: Any]]
+            }
+
+            if let movies = movies {
                 self.movies = movies
-                
-                self.activityIndicator.stopAnimating()   // Stop the activity indicator;Hides automatically if "Hides When Stopped" is enabled
                 self.tableView.reloadData()
+                self.activityIndicator.stopAnimating()   // Stop the activity indicator;Hides automatically if "Hides When
                 self.refreshControl.endRefreshing()
             }
         }
-        task.resume()
-        
-        
     }
     
     //tell how many cells
@@ -92,20 +77,13 @@ class NowPlayingViewController: UIViewController, UITableViewDataSource {
         let cell = tableView.dequeueReusableCell(withIdentifier: "MovieCell", for: indexPath) as! MovieCell
         
         
-        let movie = movies[indexPath.row]
-        let title = movie["title"] as! String
-        let overview = movie["overview"] as! String
-        
-        cell.titleLabel.text = title
-        cell.overviewLabel.text = overview
+        let movie = movies[indexPath.row] // [String: Any] -> [Movie]
+//        let title = movie["title"] as! String //
+        cell.titleLabel.text = movie.title
+        cell.overviewLabel.text = movie.overview
        
         //to get full path to poster image
-        let posterPathString = movie["poster_path"] as! String
-        //base url
-        let baseURLString = "https://image.tmdb.org/t/p/w500"
-        
-        let posterURL = URL(string: baseURLString + posterPathString)!
-        cell.posterImageView.af_setImage(withURL: posterURL)
+        cell.posterImageView.af_setImage(withURL: movie.posterUrl!)
     
         return cell
     }
@@ -122,6 +100,7 @@ class NowPlayingViewController: UIViewController, UITableViewDataSource {
         
     }
 }
+
 
 
 
