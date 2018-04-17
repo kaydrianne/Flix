@@ -213,9 +213,9 @@ Please list two areas of the assignment you'd like to **discuss further with you
 
 Here's a walkthrough of implemented user stories:
 
-<img src='https://media.giphy.com/media/3o6nV1Pkln6ZV2TNrG/giphy.gif' alt='Video Walkthrough' />
+<img src='https://media.giphy.com/media/br2EwBKLDo7IyTEacn/giphy.gif' />
 
-GIF created with [LiceCap](http://www.cockos.com/licecap/).
+GIF created with [Giphy](http://www.giphy.com).
 
 ## Notes
 
